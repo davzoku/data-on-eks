@@ -1,13 +1,13 @@
 variable "name" {
   description = "Name of the VPC and EKS Cluster"
-  default     = "jark-stack"
+  default     = "doeks-test-1"
   type        = string
 }
 
 # NOTE: Trainium and Inferentia are only available in us-west-2 and us-east-1 regions
 variable "region" {
   description = "region"
-  default     = "us-west-2"
+  default     = "us-east-2"
   type        = string
 }
 

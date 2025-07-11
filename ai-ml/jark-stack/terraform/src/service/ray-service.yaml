@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: dogbooth
 ---
-apiVersion: ray.io/v1alpha1
+apiVersion: ray.io/v1
 kind: RayService
 metadata:
   name: dogbooth
@@ -12,21 +12,28 @@ metadata:
 spec:
   serviceUnhealthySecondThreshold: 600
   deploymentUnhealthySecondThreshold: 600
-  serveConfig:
-    importPath: dogbooth:entrypoint
-    runtimeEnv: |
-      env_vars: {"MODEL_ID": "askulkarni2/dogbooth"}
-      #env_vars: {"MODEL_ID": "stabilityai/stable-diffusion-2-1"}
+  serveConfigV2: |
+    applications:
+    - name: dogbooth
+      import_path: dogbooth:entrypoint
+      runtime_env:
+        env_vars:
+          MODEL_ID: "askulkarni2/dogbooth"
   rayClusterConfig:
-    rayVersion: '2.6.0'
+    rayVersion: "2.6.0"
     headGroupSpec:
       rayStartParams:
-        dashboard-host: '0.0.0.0'
+        dashboard-host: "0.0.0.0"
       template:
         spec:
           containers:
             - name: ray-head
               image: public.ecr.aws/h3o5n2r0/dogbooth:0.0.1-gpu
+              env:
+                - name: RAY_SERVE_ENABLE_EXPERIMENTAL_STREAMING
+                  value: "1"
+                - name: MODEL_ID
+                  value: "askulkarni2/dogbooth"
               resources:
                 limits:
                   cpu: 2
@@ -56,10 +63,13 @@ spec:
             containers:
               - name: ray-worker
                 image: public.ecr.aws/h3o5n2r0/dogbooth:0.0.1-gpu
+                env:
+                  - name: MODEL_ID
+                    value: "askulkarni2/dogbooth"
                 lifecycle:
                   preStop:
                     exec:
-                      command: ["/bin/sh","-c","ray stop"]
+                      command: ["/bin/sh", "-c", "ray stop"]
                 resources:
                   limits:
                     cpu: "2"
@@ -80,21 +90,21 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - http:
-      paths:
-        # Ray Dashboard
-        - path: /dogbooth/(.*)
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: dogbooth-head-svc
-              port:
-                number: 8265
-        # Ray Serve
-        - path: /dogbooth/serve/(.*)
-          pathType: ImplementationSpecific
-          backend:
-            service:
-              name: dogbooth-head-svc
-              port:
-                number: 8000
+    - http:
+        paths:
+          # Ray Dashboard
+          - path: /dogbooth/(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dogbooth-raycluster-jnbc9-head-svc
+                port:
+                  number: 8265
+          # Ray Serve
+          - path: /dogbooth/serve/(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dogbooth-raycluster-jnbc9-head-svc
+                port:
+                  number: 8000

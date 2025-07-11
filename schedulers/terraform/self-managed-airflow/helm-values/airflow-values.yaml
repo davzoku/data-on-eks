@@ -19,9 +19,9 @@ ingress:
     annotations:
       alb.ingress.kubernetes.io/group.name: dataengineering
       alb.ingress.kubernetes.io/target-type: instance
-      alb.ingress.kubernetes.io/scheme: internal # Private Load Balancer can only be accessed within the VPC
+      alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-      alb.ingress.kubernetes.io/healthcheck-path: '/health'
+      alb.ingress.kubernetes.io/healthcheck-path: "/health"
       # Enable the following if you have public/internal domain e.g., https://mycompany.com/
       # alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
       # alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:....................."
@@ -91,11 +91,11 @@ scheduler:
 
   resources:
     limits:
-     cpu: 500m
-     memory: 1024Mi
+      cpu: 500m
+      memory: 1024Mi
     requests:
-     cpu: 500m
-     memory: 1024Mi
+      cpu: 500m
+      memory: 1024Mi
 
   # This setting tells kubernetes that its ok to evict
   # when it wants to scale a node down.
@@ -105,7 +105,7 @@ scheduler:
     create: false
     name: ${scheduler_service_account}
 
-#extraVolumes is required for DAG GitSync #https://github.com/apache/airflow/issues/27476
+  #extraVolumes is required for DAG GitSync #https://github.com/apache/airflow/issues/27476
   extraVolumes:
     - name: git-sync-ssh-key
       secret:
@@ -167,20 +167,19 @@ config:
   core:
     dags_folder: '{{ include "airflow_dags" . }}'
     # This is ignored when used with the official Docker image
-    load_examples: 'True'
-    executor: '{{ .Values.executor }}'
-    remote_logging: 'True'
+    load_examples: "True"
+    executor: "{{ .Values.executor }}"
+    remote_logging: "True"
   logging:
-    remote_logging: 'True'
-    logging_level: 'INFO'
-    colored_console_log: 'True'
+    remote_logging: "True"
+    logging_level: "INFO"
+    colored_console_log: "True"
     remote_base_log_folder: "s3://${s3_bucket_name}/airflow-logs"
     # aws_s3_conn is the name of the connection that needs to be created using Airflow admin UI once the deployment is complete
     # Steps can be seen in the docs link here -> https://github.com/apache/airflow/issues/25322
-    remote_log_conn_id: 'aws_s3_conn'
-    delete_worker_pods: 'False'
-    encrypt_s3_logs: 'True'
-
+    remote_log_conn_id: "aws_s3_conn"
+    delete_worker_pods: "False"
+    encrypt_s3_logs: "True"
 
 ###################################
 # Git sync
@@ -226,7 +225,6 @@ dags:
       github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
       github.com ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEmKSENjQEezOmxkZMy7opKgwFB9nkt5YRrYMjNuG5N87uRgg6CLrbo5wAdT/y6v0mKV0U2w0WZ2YB/++Tpockg=
       github.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCj7ndNxQowgcQnjshcLrqPEiiphnt+VTTvDP6mHBL9j1aNUkY4Ue1gvwnGLVlOhGeYrnZaMgRK6+PKCUXaDbC7qtbW8gIkhL7aGCsOr/C56SJMy/BCZfxd1nWzAOxSDPgVsmerOBYfNqltV9/hWCqBywINIR+5dIg6JTJ72pcEpEjcYgXkE2YEFXV1JHnsKgbLWNlhScqb2UmyRkQyytRLtL+38TGxkxCflmO+5Z8CSSNY7GidjMIZ7Q4zMjA2n1nGrlTDkzwDCsw+wqFPGQA179cnfGWOWRVruj16z6XyvxvjJwbz0wQZ75XK5tKSb7FNyeIEs4TT4jk+S4dhPeAUC5y+bDYirYgM4GC7uEnztnZyaVWQ7B381AK4Qdrwt51ZqExKbQpTUNn+EjqoTwvqNj4kqx5QUCI0ThS/YkOxJCXmPUWZbhjpCg56i+2aB6CmK2JGhn57K5mj0MNdBXA4/WnwH6XoPWJzK5Nyu2zB3nAZp+S5hpQs+p1vN1/wsjk=
-
 
 ###################################
 # Airflow Extra Secrets

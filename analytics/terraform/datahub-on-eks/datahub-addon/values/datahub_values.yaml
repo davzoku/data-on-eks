@@ -14,7 +14,7 @@ datahub-frontend:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: alb
-      alb.ingress.kubernetes.io/scheme: internal # Private Load Balancer can only be accessed within the VPC
+      alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: instance
       alb.ingress.kubernetes.io/inbound-cidrs: 0.0.0.0/0
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
@@ -57,8 +57,8 @@ elasticsearchSetupJob:
     runAsUser: 1000
   podAnnotations: {}
   extraEnvs:
-      - name: USE_AWS_ELASTICSEARCH
-        value: "true"
+    - name: USE_AWS_ELASTICSEARCH
+      value: "true"
 
 kafkaSetupJob:
   enabled: true
@@ -90,7 +90,6 @@ mysqlSetupJob:
 #    runAsUser: 1000
 #  podAnnotations: {}
 
-
 datahubUpgrade:
   enabled: true
   image:
@@ -100,13 +99,16 @@ datahubUpgrade:
   noCodeDataMigration:
     sqlDbType: "MYSQL"
     # sqlDbType: "POSTGRES"
-  podSecurityContext: {}
+  podSecurityContext:
+    {}
     # fsGroup: 1000
-  securityContext: {}
+  securityContext:
+    {}
     # runAsUser: 1000
   podAnnotations: {}
   # Add extra sidecar containers to job pod
-  extraSidecars: []
+  extraSidecars:
+    []
     # - name: my-image-name
     #   image: my-image
     #   imagePullPolicy: Always
@@ -118,7 +120,8 @@ datahubUpgrade:
     helm.sh/hook-delete-policy: before-hook-creation
   cleanupJob:
     # Add extra sidecar containers to job pod
-    extraSidecars: []
+    extraSidecars:
+      []
       # - name: my-image-name
       #   image: my-image
       #   imagePullPolicy: Always
@@ -131,7 +134,8 @@ datahubUpgrade:
         cpu: 300m
         memory: 256Mi
     # Add extra sidecar containers to job pod
-    extraSidecars: []
+    extraSidecars:
+      []
       # - name: my-image-name
       #   image: my-image
       #   imagePullPolicy: Always
@@ -142,9 +146,11 @@ datahubSystemUpdate:
   image:
     repository: acryldata/datahub-upgrade
     # tag:
-  podSecurityContext: {}
+  podSecurityContext:
+    {}
     # fsGroup: 1000
-  securityContext: {}
+  securityContext:
+    {}
     # runAsUser: 1000
   podAnnotations: {}
   resources:
@@ -155,7 +161,8 @@ datahubSystemUpdate:
       cpu: 300m
       memory: 256Mi
   # Add extra sidecar containers to job pod
-  extraSidecars: []
+  extraSidecars:
+    []
     # - name: my-image-name
     #   image: my-image
     #   imagePullPolicy: Always
@@ -304,7 +311,6 @@ global:
       #    secret: <secret value>
       #    signingKey: <signing key value>
       #    salt: <salt value>
-
 #  hostAliases:
 #    - ip: "192.168.0.104"
 #      hostnames:
